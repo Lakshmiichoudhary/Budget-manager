@@ -4,7 +4,6 @@ import { useEffect } from "react"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "./Utils/Firebase"
 import { addUser, removeUser } from "./Utils/userSlice"
-import { useNavigate } from "react-router-dom"
 
 function App() {
   const dispatch = useDispatch()

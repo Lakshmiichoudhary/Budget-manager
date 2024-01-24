@@ -1,11 +1,26 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Header from '../Header/Header'
-import { updateProfile } from 'firebase/auth'
+import { onAuthStateChanged, updateProfile } from 'firebase/auth'
 import { auth } from '../../Utils/Firebase'
 
 const Profile = () => {
     const fullname = useRef(null)
     const profilUrl = useRef(null)
+    const [userData,setUserData] = useState({fullname:"" , profilUrl:""})
+
+    useEffect(()=>{
+        const authStateChanged = onAuthStateChanged(auth,(user) => {
+            if(user) {
+                setUserData({
+                    fullname: user.displayName || "",
+                    profilUrl: user.photoURL || "",
+                })
+            }
+        })
+        return () => {
+            authStateChanged();
+        }
+    },[])
 
     const handleUpdateProfile = async () => {
 
@@ -37,7 +52,10 @@ const Profile = () => {
             <label>Full Name</label>
             <input className='p-2 m-2 rounded-md bg-slate-600' 
             ref={fullname}
-            type="text" />
+            type="text"
+            value={userData.fullname}
+            onChange={(e) => setUserData({ ...userData, fullName: e.target.value })} 
+            />
         </div>
         <div className='ml-96 m-2 p-2 font-bold'>
             <label>Profile Photo Url</label>
