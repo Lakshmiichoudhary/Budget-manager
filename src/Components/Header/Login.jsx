@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react'
 import Header from './Header'
 import validations from '../../Utils/Validations'
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../../Utils/Firebase'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const Login = () => {
   const [isLogin,setIsLogin] = useState(true)
@@ -56,7 +56,7 @@ const Login = () => {
   }
 
   const sendEmailVerification = (user) => {
-    sendEmailVerification(auth,current.user)
+    sendEmailVerification(user)
     .then(() =>{
       console.log("verification email sent")
       navigate("/expense")
@@ -64,7 +64,6 @@ const Login = () => {
     .catch((error) => {
       console.error("Error while verifing email",error)
     })
-
   }
 
   return (
@@ -100,6 +99,9 @@ const Login = () => {
             />
         </div>)}
         <p className='mx-16 text-red-800 font-bold'>{isError}</p>
+        {isLogin && (<Link to="resetPassword" className='mx-16 p-2 text-white cursor-pointer'>
+          Forgot Password?
+        </Link>)}
         <button className='p-3 px-24 m-6 mx-16 bg-black text-white rounded-full border-2 border-yellow-700'
             onClick={submitHandler}>
           {!isLogin ? "signup" : "login"}

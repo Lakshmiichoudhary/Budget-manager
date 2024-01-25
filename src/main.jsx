@@ -7,6 +7,7 @@ import Expense from './Components/Expense/Expense.jsx'
 import { Provider } from 'react-redux'
 import appStore from './Utils/appStore.jsx'
 import Profile from './Components/Expense/Profile.jsx'
+import ResetPasswoed from './Components/Expense/ResetPasswoed.jsx'
 
   const approuter = createBrowserRouter([
     {
@@ -20,6 +21,10 @@ import Profile from './Components/Expense/Profile.jsx'
     {
       path: "profile",
       element: <Profile />
+    },
+    {
+      path: "resetPassword",
+      element: <ResetPasswoed />
     } 
   ])
 
