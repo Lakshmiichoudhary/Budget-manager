@@ -1,10 +1,17 @@
 import { signOut } from 'firebase/auth'
-import React from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { auth } from '../../Utils/Firebase'
+import ExpenseForm from './ExpenseForm'
+import ExpenseList from './ExpenseList'
 
 const Expense = () => {
   const navigate = useNavigate()
+  const [expenses,setExpenses] = useState([])
+
+  const handleAddExpense = (newExpense) => {
+    setExpenses([...expenses, newExpense]);
+  };
 
   const handleSignOut = () => {
     signOut(auth)
@@ -16,6 +23,7 @@ const Expense = () => {
     })
   } 
   return (
+    <div>
     <div className='flex justify-between  bg-slate-900 p-6  h-20'>
     <h1 className='text-yellow-700 text-2xl'>Welcome To expense Tracker</h1>
     <div className='flex mx-4'>
@@ -26,6 +34,9 @@ const Expense = () => {
       LogOut
     </button>
     </div>
+    </div>
+      <ExpenseForm onAddExpenses={handleAddExpense} />
+      <ExpenseList expenses={expenses}/>
     </div>
   )
 }
