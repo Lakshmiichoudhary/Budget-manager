@@ -55,6 +55,18 @@ const Login = () => {
       }
   }
 
+  const sendEmailVerification = (user) => {
+    sendEmailVerification(auth,current.user)
+    .then(() =>{
+      console.log("verification email sent")
+      navigate("/expense")
+    })
+    .catch((error) => {
+      console.error("Error while verifing email",error)
+    })
+
+  }
+
   return (
     <div>
       <div>
