@@ -1,9 +1,10 @@
 import { signOut } from 'firebase/auth'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { auth } from '../../Utils/Firebase'
+import { auth, database } from '../../Utils/Firebase'
 import ExpenseForm from './ExpenseForm'
 import ExpenseList from './ExpenseList'
+import { onValue, ref } from 'firebase/database'
 
 const Expense = () => {
   const navigate = useNavigate()
@@ -22,6 +23,19 @@ const Expense = () => {
 
     })
   } 
+
+  useEffect(() => {
+    // Fetch expenses from Firebase on component mount
+    const expensesRef = ref(database, 'expenses');
+    onValue(expensesRef, (snapshot) => {
+      const expensesData = snapshot.val();
+      if (expensesData) {
+        const expensesArray = Object.values(expensesData);
+        setExpenses(expensesArray);
+      }
+    });
+  }, []); 
+
   return (
     <div>
     <div className='flex justify-between  bg-slate-900 p-6  h-20'>
@@ -35,8 +49,10 @@ const Expense = () => {
     </button>
     </div>
     </div>
+    <div className='flex'>
       <ExpenseForm onAddExpenses={handleAddExpense} />
       <ExpenseList expenses={expenses}/>
+    </div>  
     </div>
   )
 }

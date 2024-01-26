@@ -1,4 +1,6 @@
+import { push, ref } from 'firebase/database'
 import React, { useState } from 'react'
+import { database } from '../../Utils/Firebase'
 
 const ExpenseForm = ({onAddExpenses}) => {
     const [amount,setAmount]= useState("")
@@ -12,13 +14,17 @@ const ExpenseForm = ({onAddExpenses}) => {
         return
     }
 
-    const newExense = {
+    const newExpense = {
         amount,
         description,
         category
     }
 
-    onAddExpenses(newExense)
+    const expensesRef = ref(database, 'expenses');
+    push(expensesRef, newExpense);
+
+
+    onAddExpenses(newExpense)
         setAmount("")
         setdescription("")
         setcategory("")
