@@ -1,37 +1,66 @@
-import { push, ref } from 'firebase/database'
-import React, { useState } from 'react'
-import { database } from '../../Utils/Firebase'
+import React, { useEffect, useState } from 'react';
+import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc} from '@firebase/firestore';
+import { db } from '../../Utils/Firebase';
 
-const ExpenseForm = ({onAddExpenses}) => {
-    const [amount,setAmount]= useState("")
-    const [description,setdescription]= useState("")
-    const [category,setcategory]= useState("")
+const ExpenseForm = () => {
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [expense,setExpense] = useState([]);
+  const [id,setId] = useState("")
+  const [show,setShow] = useState(false)
 
-    const handleSubmit = (e) => {
+  const expenseCollection = collection(db, "exp")
+
+  useEffect(() => {
+    const getData = async () => {
+        const dbexp = await getDocs(expenseCollection)
+        setExpense(dbexp.docs.map(doc=>({...doc.data(),id:doc.id})))
+    }
+    getData()
+  })
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); 
+  
+    await addDoc(expenseCollection, {
+      amount: amount,
+      description: description,
+      category: category,
+    });
+  
+    setAmount('');
+    setDescription('');
+    setCategory('');
+  };
+  
+    const handleDelete = async (id) => {
+        const deleteData = doc(db, 'exp', id);
+        await deleteDoc(deleteData)
+    }
+
+    const handleEdit = async (id,amount,description,category) => {
+        setAmount(amount)
+        setDescription(description)
+        setCategory(category)
+        setId(id)
+        setShow(true)
+    }
+
+    const handleUpdate = async (e) => {
         e.preventDefault()
-        if(!amount || !description || !category){
-        alert("Please enter all the fields")
-        return
+        const updateData = doc(db,"exp",id)
+        await updateDoc(updateData,{amount:amount,description:description,category:category})
+        setShow(false)
+        setAmount(""),
+        setDescription(""),
+        setCategory("")
     }
 
-    const newExpense = {
-        amount,
-        description,
-        category
-    }
 
-    const expensesRef = ref(database, 'expenses');
-    push(expensesRef, newExpense);
-
-
-    onAddExpenses(newExpense)
-        setAmount("")
-        setdescription("")
-        setcategory("")
-
-    }
   return (
-    <form className='w-4/12 bg-slate-900 p-12 text-white m-8 mx-28 border-2 border-yellow-700'>
+    <div className='flex'>
+    <form className=' bg-slate-900 p-12 text-white m-8 mx-28 border-2 border-yellow-700'>
         <div className='p-2 m-2'>
         <label>Money Spent</label>
             <input className='m-1 ml-2 p-2 text-black'
@@ -48,7 +77,7 @@ const ExpenseForm = ({onAddExpenses}) => {
                 id="description"
                 name="description"
                 value={description}
-                onChange={(e) => setdescription(e.target.value)}
+                onChange={(e) => setDescription(e.target.value)}
                 />
         </div>
         <div className='p-2 m-2'>
@@ -57,7 +86,7 @@ const ExpenseForm = ({onAddExpenses}) => {
             id="category"
             name="category"
             value={category}
-            onChange={(e) => setcategory(e.target.value)}
+            onChange={(e) => setCategory(e.target.value)}
             >
             <option value="">select category</option>
             <option value="food">Food</option>
@@ -65,12 +94,38 @@ const ExpenseForm = ({onAddExpenses}) => {
             <option value="salary">Salary</option>
         </select>
         </div>
-        <button className='p-2 px-6 rounded-lg m-2 bg-black text-white border-2 border-yellow-700'
+        {!show ? <button className='p-2 px-6 rounded-lg m-2 bg-black text-white border-2 border-yellow-700'
             onClick={handleSubmit}>
             Add
-        </button>
+        </button> :
+        <button className='p-2 px-6 rounded-lg m-2 bg-black text-white border-2 border-yellow-700'
+            onClick={handleUpdate}>
+            update
+        </button>}
     </form>
-  )
-}
+    <div className='w-5/12 bg-slate-900 p-12 text-white m-8 mx-28 border-2 border-yellow-700' >
+      <h1 className='m-1 border-b-2 border-black p-2 font-bold text-center'>Expense</h1>
+        {expense.map((expenseItem) => (
+          <ul className='flex border-b-2 border-black p-4 m-2' key={expenseItem.id}>
+            <li className='m-2'>Amount {expenseItem.amount}</li>
+            <li className='m-2'>Description {expenseItem.description}</li>
+            <li className='m-2'>Category {expenseItem.category}</li>
+            <button className='p-2 m-2 bg-red-800 rounded-lg' onClick={() => handleDelete(expenseItem.id)}>
+                Delete
+            </button>
+            <button className='p-3 m-2 bg-lime-700 rounded-lg' onClick={() => handleEdit(
+                expenseItem.id,
+                expenseItem.amount,
+                expenseItem.description,
+                expenseItem.category
+                )}>Edit
+            </button>
+          </ul>
+        ))}
+      </div>
+    </div>
+  );
+};
 
+    
 export default ExpenseForm
