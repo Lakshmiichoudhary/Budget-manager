@@ -1,10 +1,14 @@
 import {configureStore} from "@reduxjs/toolkit"
-import userSlice from "./userSlice";
+import authSlice from "./authSlice";
+import themeSlice from "./themeSlice";
+import ExpenseSlice from "./ExpenseSlice";
 
 const appStore = configureStore(
     {
         reducer:{
-            user: userSlice
+            auth: authSlice,
+            expenses: ExpenseSlice,
+            theme: themeSlice
 
         }
     }

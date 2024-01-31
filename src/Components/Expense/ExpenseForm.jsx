@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc} from '@firebase/firestore';
 import { db } from '../../Utils/Firebase';
+import { useDispatch, useSelector } from 'react-redux';
+import { activatePremium } from '../../Utils/authSlice';
 
 const ExpenseForm = () => {
   const [amount, setAmount] = useState("");
@@ -10,6 +12,12 @@ const ExpenseForm = () => {
   const [id,setId] = useState("")
   const [show,setShow] = useState(false)
 
+  const dispatch = useDispatch();
+  const expenses = useSelector((state) => state.expenses.expenses);
+  const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
+  const isPremium = useSelector((state) => state.auth.isPremium);
+
+
   const expenseCollection = collection(db, "exp")
 
   useEffect(() => {
@@ -18,9 +26,9 @@ const ExpenseForm = () => {
         setExpense(dbexp.docs.map(doc=>({...doc.data(),id:doc.id})))
     }
     getData()
-  })
+  },[])
 
-  const handleSubmit = async (e) => {
+  const handleAddExpense = async (e) => {
     e.preventDefault(); 
   
     await addDoc(expenseCollection, {
@@ -57,7 +65,10 @@ const ExpenseForm = () => {
         setCategory("")
     }
 
-
+    const handlePremiumActivation = () => {
+      dispatch(activatePremium());
+    };
+  
   return (
     <div className='flex'>
     <form className=' bg-slate-900 p-12 text-white m-8 mx-28 border-2 border-yellow-700'>
@@ -95,13 +106,19 @@ const ExpenseForm = () => {
         </select>
         </div>
         {!show ? <button className='p-2 px-6 rounded-lg m-2 bg-black text-white border-2 border-yellow-700'
-            onClick={handleSubmit}>
-            Add
+            onClick={handleAddExpense}>
+              Add Expense
         </button> :
         <button className='p-2 px-6 rounded-lg m-2 bg-black text-white border-2 border-yellow-700'
             onClick={handleUpdate}>
             update
         </button>}
+        {totalExpenses >= 10000 && !isPremium && (
+        <button className="p-2 px-6 rounded-lg m-2 bg-black text-white border-2 border-yellow-700" 
+          onClick={handlePremiumActivation}>
+          Activate Premium
+        </button>
+      )}
     </form>
     <div className='w-5/12 bg-slate-900 p-12 text-white m-8 mx-28 border-2 border-yellow-700' >
       <h1 className='m-1 border-b-2 border-black p-2 font-bold text-center'>Expense</h1>

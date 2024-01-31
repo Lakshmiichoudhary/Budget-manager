@@ -1,17 +1,17 @@
 import React, { useRef, useState } from 'react'
 import Header from './Header'
 import validations from '../../Utils/Validations'
-import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../../Utils/Firebase'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate,  } from 'react-router-dom'
 
 const Login = () => {
   const [isLogin,setIsLogin] = useState(true)
   const [isError,setIsError] = useState("")
+  const navigate = useNavigate()
   const email = useRef(null)
   const password = useRef(null)
   const confirmPassword = useRef(null)
-  const navigate = useNavigate()
 
   const toggleLog = () => {
     setIsLogin(!isLogin)
@@ -59,7 +59,6 @@ const Login = () => {
     sendEmailVerification(user)
     .then(() =>{
       console.log("verification email sent")
-      navigate("/expense")
     })
     .catch((error) => {
       console.error("Error while verifing email",error)

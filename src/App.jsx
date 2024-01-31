@@ -1,28 +1,38 @@
+import { RouterProvider, createBrowserRouter } from "react-router-dom"
 import Login from "./Components/Header/Login"
-import { useDispatch } from "react-redux"
-import { useEffect } from "react"
-import { onAuthStateChanged } from "firebase/auth"
-import { auth } from "./Utils/Firebase"
-import { addUser, removeUser } from "./Utils/userSlice"
+import Expense from "./Components/Expense/Expense"
+import Profile from "./Components/Expense/Profile"
+import ResetPasswoed from "./Components/Expense/ResetPasswoed"
+import { useSelector } from "react-redux"
+
 
 function App() {
-  const dispatch = useDispatch()
+  const isDarkTheme = useSelector((state) => state.theme.isDarkTheme);
 
-  useEffect(() => {
-    onAuthStateChanged(auth,(user) => {
-      if(user){
-        const {uid,email}= user
-        dispatch(addUser({uid:uid,email:email}))
-       
-      }else{
-        dispatch(removeUser())
-       
-      }
-    })
-  },[])
+  const approuter = createBrowserRouter([
+    {
+      path: "/",
+      element: <Login />
+    },
+    {
+      path: "expense",
+      element: <Expense />,
+    },  
+    {
+      path: "profile",
+      element: <Profile />
+    },
+    {
+      path: "resetPassword",
+      element: <ResetPasswoed />
+    } 
+  ])
+
 
   return (
-      <Login />
+    <div className={`h-screen ${isDarkTheme ? "bg-white text-gray-800" : " bg-gray-800 text-black"}`}>
+    <RouterProvider router={approuter} />
+    </div>
   )
 }
 
